@@ -11,22 +11,28 @@ class Transaction {
         this.senderSignature = senderSignature;
     }
 
-    isValidTransaction = () => {
-        if (this.isValidHex(this.sender, 40) && this.isValidHex(this.recipient, 40)) {
-
-        } else if(this.isPositiveNumber(this.value) && this.isPositiveNumber(this.fee)){
-
+    isValidTransaction() {
+        if (!(this.isValidHex(this.sender, 40) &&
+            this.isValidHex(this.recipient, 40) && 
+            this.isValidHex(this.senderPubKey, 65))) {
+            return false;
+        } else if(!(this.isPositiveNumber(this.value) && 
+            this.isPositiveNumber(this.fee))) {
+            return false; 
+        } else if(this.senderSignature.length !== 2){
+            return false;
         }
+        return true;
     }
     
-    isValidHex = (hex, hexLength) => {
+    isValidHex(hex, hexLength) {
         if (hex.length != hexLength) {
             return false;
         } 
         return true;
     }
 
-    isPositiveNumber = (number) => {
+    isPositiveNumber(number) {
         return parseFloat(number) >= 0;
     }
 }
