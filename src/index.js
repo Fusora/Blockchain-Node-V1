@@ -1,5 +1,5 @@
-const express = require('express')
-const bodyParser = require('body-parser');
+import express from 'express';
+import bodyParser from 'body-parser';
 
 const app = express()
     .use(bodyParser.json())
@@ -7,6 +7,6 @@ const app = express()
 
 app.get('/', (req, res) => {
     res.set('Hello World')
-})
+});
 
-app.listen(3000)
+app.listen(3000, ()=>console.log('Running at port 3000'))

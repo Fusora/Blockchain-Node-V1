@@ -1,4 +1,4 @@
-const Block = require('./Block');
+import Block from './Block';
 let privateProperty = new WeakMap();
 
 class Blockchain {
@@ -56,4 +56,4 @@ class Blockchain {
     }
 }
 
-module.exports = Blockchain;
+export default Blockchain

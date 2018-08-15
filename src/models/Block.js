@@ -1,4 +1,4 @@
-const CryptoJS = require('crypto-js');
+import CryptoJS from 'crypto-js';
 
 class Block {
     constructor(index, previousHash, timestamp, transactions, difficulty, minedBy, nonce, hash) {
@@ -19,4 +19,4 @@ class Block {
     }
 }
 
-module.exports = Block;
+export default Block;
