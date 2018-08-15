@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.js",
+    "dev": "nodemon -r @babel/register src/index.js",
     "start": "node src/index.js"
   },
   "repository": {
@@ -24,6 +24,10 @@
     "express": "^4.16.3"
   },
   "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.38",
+    "@babel/core": "^7.0.0-beta.42",
+    "@babel/preset-env": "^7.0.0-beta.38",
+    "@babel/register": "^7.0.0-beta.38",
     "nodemon": "^1.18.3"
   }
 }
