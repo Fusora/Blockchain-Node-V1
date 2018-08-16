@@ -1,10 +1,11 @@
 import Joi from 'joi';
+import { utils } from 'ethers';
 import TransactionSchema from '../schema/TransactionSchema';
 
 class Transaction {
   constructor(
     from, to, value, fee, dateCreated, data,
-    senderPubKey, transactionDataHash, senderSignature,
+    senderPubKey, senderSignature,
   ) {
     this.from = from;
     this.to = to;
@@ -13,12 +14,26 @@ class Transaction {
     this.dateCreated = dateCreated;
     this.data = data;
     this.senderPubKey = senderPubKey;
-    this.transactionDataHash = transactionDataHash;
     this.senderSignature = senderSignature;
   }
 
   isValid() {
     return !Joi.validate(this, TransactionSchema).error;
+  }
+
+  get transactionHash() {
+    const transactionToBeHash = {
+      from: this.from,
+      to: this.to,
+      value: this.value,
+      fee: this.fee,
+      dateCreated: this.dateCreated,
+      data: this.data,
+      senderPubKey: this.senderPubKey,
+    };
+
+    const stringedTransaction = utils.toUtf8Bytes(JSON.stringify(transactionToBeHash));
+    return utils.sha256(stringedTransaction);
   }
 }
 
