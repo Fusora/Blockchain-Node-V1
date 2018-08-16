@@ -1,7 +1,13 @@
+import Joi from 'joi';
+import TransactionSchema from '../schema/TransactionSchema';
+
 class Transaction {
-  constructor(sender, recipient, value, fee, dateCreated, data, senderPubKey, transactionDataHash, senderSignature) {
-    this.sender = sender;
-    this.recipient = recipient;
+  constructor(
+    from, to, value, fee, dateCreated, data,
+    senderPubKey, transactionDataHash, senderSignature,
+  ) {
+    this.from = from;
+    this.to = to;
     this.value = value;
     this.fee = fee;
     this.dateCreated = dateCreated;
@@ -11,29 +17,8 @@ class Transaction {
     this.senderSignature = senderSignature;
   }
 
-  isValidTransaction() {
-    if (!(this.isValidHex(this.sender, 40)
-            && this.isValidHex(this.recipient, 40)
-            && this.isValidHex(this.senderPubKey, 65))) {
-      return false;
-    } if (!(this.isPositiveNumber(this.value)
-            && this.isPositiveNumber(this.fee))) {
-      return false;
-    } if (this.senderSignature.length !== 2) {
-      return false;
-    }
-    return true;
-  }
-
-  isValidHex(hex, hexLength) {
-    if (hex.length != hexLength) {
-      return false;
-    }
-    return true;
-  }
-
-  isPositiveNumber(number) {
-    return parseFloat(number) >= 0;
+  isValid() {
+    return !Joi.validate(this, TransactionSchema).error;
   }
 }
 
