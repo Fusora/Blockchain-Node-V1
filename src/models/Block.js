@@ -1,10 +1,10 @@
 import CryptoJS from 'crypto-js';
 
 class Block {
-  constructor(index, previousHash, timestamp, transactions, difficulty, minedBy, nonce, hash) {
+  constructor(index, previousHash, dateCreated, transactions, difficulty, minedBy, nonce, hash) {
     this.index = index;
     this.previousHash = previousHash;
-    this.timestamp = timestamp;
+    this.dateCreated = dateCreated;
     this.transactions = transactions;
     this.difficulty = difficulty;
     this.minedBy = minedBy;
@@ -14,10 +14,10 @@ class Block {
 
   calculateHash() {
     const {
-      index, previousHash, timestamp, transactions, nonce,
+      index, previousHash, dateCreated, transactions, nonce,
     } = this;
     const dataString = JSON.stringify(transactions);
-    return CryptoJS.SHA256(index + previousHash + timestamp + dataString + nonce).toString();
+    return CryptoJS.SHA256(index + previousHash + dateCreated + dataString + nonce).toString();
   }
 }
 

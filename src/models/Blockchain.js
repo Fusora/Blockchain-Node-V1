@@ -1,4 +1,5 @@
 import Block from './Block';
+import Transaction from './Transaction';
 
 const privateProperty = new WeakMap();
 
@@ -11,7 +12,7 @@ class Blockchain {
   }
 
   generateGenesisBlock() {
-    const genesisBlock = new Block(0, '0', 1465154705, 'my genesis block', 0, '0000000000000000000000000000000000000000', 0, '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7');
+    const genesisBlock = new Block(0, '0', 1465154705, undefined, 0, '0000000000000000000000000000000000000000', 0, '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7');
     if (!this.chain.includes(genesisBlock)) {
       privateProperty.set(this, { genesisBlock });
       this.chain.push(genesisBlock);
@@ -22,6 +23,20 @@ class Blockchain {
     return this.chain[this.chain.length - 1];
   }
 
+  getConfirmedTransactions() {
+    return this.chain.reduce((acc, val) => {
+      if (val.transactions) {
+        acc.push(...val.transactions);
+      }
+      return acc;
+    }, []);
+  }
+
+  getTransaction(transactionHash) {
+    const confirmedTransactions = this.getConfirmedTransactions();
+    return confirmedTransactions.filter(t => t.transactionDataHash === transactionHash)[0];
+  }
+
   addBlock(newBlock) {
     if (this.isValidNewBlock(this.getLatestBlock(), newBlock)) {
       this.chain.push(newBlock);
@@ -29,7 +44,15 @@ class Blockchain {
   }
 
   addTransaction(transaction) {
-    const index = this.pendingTransactions.push(transaction);
+    const {
+      sender, recipient, value, fee, dateCreated, data,
+      senderPubKey, transactionDataHash, senderSignature,
+    } = transaction;
+    const newTransaction = new Transaction(
+      sender, recipient, value, fee, dateCreated,
+      data, senderPubKey, transactionDataHash, senderSignature,
+    );
+    const index = this.pendingTransactions.push(newTransaction);
     return this.pendingTransactions[index - 1];
   }
 
