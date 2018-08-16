@@ -1,4 +1,4 @@
-const utils = require('ethers').utils;
+const { utils } = require('ethers');
 
 class Transaction {
   constructor(sender, recipient, value, fee, dateCreated, data, senderPubKey, senderSignature) {
@@ -40,13 +40,13 @@ class Transaction {
 
   get transactionHash() {
     const transactionToBeHash = {
-      'sender': this.sender,
-      'recipient': this.recipient,
-      'value': this.value,
-      'fee': this.fee,
-      'dateCreated': this.dateCreated,
-      'data': this.data,
-      'senderPubKey': this.senderPubKey,
+      sender: this.sender,
+      recipient: this.recipient,
+      value: this.value,
+      fee: this.fee,
+      dateCreated: this.dateCreated,
+      data: this.data,
+      senderPubKey: this.senderPubKey,
     };
 
     const stringedTransaction = utils.toUtf8Bytes(JSON.stringify(transactionToBeHash));
@@ -55,4 +55,3 @@ class Transaction {
 }
 
 export default Transaction;
-
