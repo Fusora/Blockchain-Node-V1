@@ -1,5 +1,7 @@
+const utils = require('ethers').utils;
+
 class Transaction {
-  constructor(sender, recipient, value, fee, dateCreated, data, senderPubKey, transactionDataHash, senderSignature) {
+  constructor(sender, recipient, value, fee, dateCreated, data, senderPubKey, senderSignature) {
     this.sender = sender;
     this.recipient = recipient;
     this.value = value;
@@ -7,7 +9,7 @@ class Transaction {
     this.dateCreated = dateCreated;
     this.data = data;
     this.senderPubKey = senderPubKey;
-    this.transactionDataHash = transactionDataHash;
+    // this.transactionDataHash = transactionDataHash;
     this.senderSignature = senderSignature;
   }
 
@@ -35,6 +37,22 @@ class Transaction {
   isPositiveNumber(number) {
     return parseFloat(number) >= 0;
   }
+
+  get transactionHash() {
+    const transactionToBeHash = {
+      'sender': this.sender,
+      'recipient': this.recipient,
+      'value': this.value,
+      'fee': this.fee,
+      'dateCreated': this.dateCreated,
+      'data': this.data,
+      'senderPubKey': this.senderPubKey,
+    };
+
+    const stringedTransaction = utils.toUtf8Bytes(JSON.stringify(transactionToBeHash));
+    return utils.sha256(stringedTransaction);
+  }
 }
 
 export default Transaction;
+
