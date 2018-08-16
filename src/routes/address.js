@@ -1,13 +1,15 @@
 import express from 'express';
 
-const router = express.Router();
+export default (node) => {
+  const router = express.Router();
 
-router.get('/address/:address/transactions', (req, res) => {
+  router.get('/:address/transactions', (req, res) => {
+    res.status(200).send({ firstname: 'congrates!' });
+  });
 
-});
+  router.get('/:address/balance', (req, res) => {
+    res.status(200).send(node);
+  });
 
-router.get('/address/:address/balance', (req, res) => {
-
-});
-
-export default router;
+  return router;
+};

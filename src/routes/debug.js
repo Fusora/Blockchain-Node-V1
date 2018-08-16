@@ -1,17 +1,19 @@
 import express from 'express';
 
-const router = express.Router();
+export default (node) => {
+  const router = express.Router();
 
-router.get('/debug', (req, res) => {
+  router.get('/', (req, res) => {
 
-});
+  });
 
-router.get('/debug/reset-chain', (req, res) => {
+  router.get('/reset-chain', (req, res) => {
 
-});
+  });
 
-router.get('/debug/mine/:minerAddress/:difficulty', (req, res) => {
+  router.get('/mine/:minerAddress/:difficulty', (req, res) => {
 
-});
+  });
 
-export default router;
+  return router;
+};

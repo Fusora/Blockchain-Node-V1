@@ -3,9 +3,11 @@ import Block from './Block';
 const privateProperty = new WeakMap();
 
 class Blockchain {
-  constructor(currentDifficulty) {
+  constructor(currentDifficulty, transactions) {
     this.chain = [];
     this.difficulty = currentDifficulty;
+    this.pendingTransactions = transactions || [];
+    this.generateGenesisBlock();
   }
 
   generateGenesisBlock() {
@@ -21,7 +23,14 @@ class Blockchain {
   }
 
   addBlock(newBlock) {
-    this.isValidNewBlock(this.getLatestBlock(), newBlock) && this.chain.push(newBlock);
+    if (this.isValidNewBlock(this.getLatestBlock(), newBlock)) {
+      this.chain.push(newBlock);
+    }
+  }
+
+  addTransaction(transaction) {
+    const index = this.pendingTransactions.push(transaction);
+    return this.pendingTransactions[index - 1];
   }
 
   replaceChain(newBlocks) {
@@ -37,7 +46,7 @@ class Blockchain {
       return false;
     }
     const tempBlock = [chain[0]];
-    for (let i = 1; i < chain.length; i++) {
+    for (let i = 1; i < chain.length; i += 1) {
       if (this.isValidNewBlock(tempBlock[i - 1], chain[i])) {
         tempBlock.push(chain[i]);
       } else {

@@ -1,17 +1,19 @@
 import express from 'express';
 
-const router = express.Router();
+export default (node) => {
+  const router = express.Router();
 
-router.get('/peers', (req, res) => {
+  router.get('/', (req, res) => {
 
-});
+  });
 
-router.post('/peers/connect', (req, res) => {
+  router.post('/connect', (req, res) => {
 
-});
+  });
 
-router.post('/peers/notify-new-block', (req, res) => {
+  router.post('/notify-new-block', (req, res) => {
 
-});
+  });
 
-export default router;
+  return router;
+};

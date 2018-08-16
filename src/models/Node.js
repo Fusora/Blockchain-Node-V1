@@ -3,7 +3,7 @@ class Node {
     this.nodeId = nodeId;
     this.selfUrl = selfUrl;
     this.peers = peers;
-    this.chain = chain;
+    this.blockchain = chain;
   }
 }
 

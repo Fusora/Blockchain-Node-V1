@@ -1,13 +1,23 @@
 import express from 'express';
 
-const router = express.Router();
+export default (node) => {
+  const router = express.Router();
 
-router.get('/blocks', (req, res) => {
+  router.get('/', (req, res) => {
+    res.status(200).send(node.blockchain.chain);
+  });
 
-});
+  router.get('/:index', (req, res) => {
+    const {
+      params: { index },
+    } = req;
 
-router.get('/blocks/:index', (req, res) => {
+    if (Number(index) < node.blockchain.chain.length) {
+      res.status(200).send(node.blockchain.chain[index]);
+    } else {
+      res.status(400).send({ error: 'Block is invalid' });
+    }
+  });
 
-});
-
-export default router;
+  return router;
+};

@@ -1,9 +1,11 @@
 import express from 'express';
 
-const router = express.Router();
+export default (node) => {
+  const router = express.Router();
 
-router.get('/info', (req, res) => {
-  res.send('Info api');
-});
+  router.get('/', (req, res) => {
+    res.send('Info api');
+  });
 
-export default router;
+  return router;
+};

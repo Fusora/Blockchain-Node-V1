@@ -20,4 +20,4 @@ const node = new Node(uuid(), `http://localhost:${port}`, null, blockchain);
 // initializes routes for rest api
 setupRouter(app, node);
 
-app.listen(port, () => console.log(`Running on port: ${port}`));
+app.listen(port, () => console.log(`Running Fusora node on: ${port}`));
