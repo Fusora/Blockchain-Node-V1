@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -r @babel/register src/index.js",
+    "mine": "python3 src/miner.py",
     "start": "node src/index.js"
   },
   "repository": {
