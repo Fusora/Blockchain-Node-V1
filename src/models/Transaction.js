@@ -1,8 +1,9 @@
 import Joi from 'joi';
 import { utils } from 'ethers';
-import TransactionSchema from '../schema/TransactionSchema';
+import transactionSchema from '../schema/TransactionSchema';
+import Model from './Model';
 
-class Transaction {
+class Transaction extends Model {
   constructor(
     from, to, value, fee, dateCreated, data,
     senderPubKey, senderSignature,
@@ -17,10 +18,10 @@ class Transaction {
     this.senderSignature = senderSignature;
   }
 
-  isValid() {
-    return !Joi.validate(this, TransactionSchema).error;
+  static get schema() {
+    return transactionSchema;
   }
-
+ 
   get transactionHash() {
     const transactionToBeHash = {
       from: this.from,

@@ -1,14 +1,19 @@
 import Block from './Block';
+import Model from './Model';
 import Transaction from './Transaction';
 
 const privateProperty = new WeakMap();
 
-class Blockchain {
+class Blockchain extends Model{
   constructor(currentDifficulty, transactions) {
     this.chain = [];
     this.difficulty = currentDifficulty;
     this.pendingTransactions = transactions || [];
     this.generateGenesisBlock();
+  }
+
+  static get schema() {
+    
   }
 
   generateGenesisBlock() {
