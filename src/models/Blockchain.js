@@ -12,7 +12,7 @@ class Blockchain {
   }
 
   generateGenesisBlock() {
-    const genesisBlock = new Block(0, '0', 1465154705, undefined, 0, '0000000000000000000000000000000000000000', 0, '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7');
+    const genesisBlock = new Block(0, undefined, 0, '0', '0000000000000000000000000000000000000000', undefined, 0, '2018-08-17T08:33:54.119Z', '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7');
     if (!this.chain.includes(genesisBlock)) {
       privateProperty.set(this, { genesisBlock });
       this.chain.push(genesisBlock);
@@ -37,10 +37,22 @@ class Blockchain {
     return confirmedTransactions.filter(t => t.transactionDataHash === transactionHash)[0];
   }
 
+  getMiningJob() {
+    const miningJob = new Block(
+      this.getLatestBlock().index + 1,
+      this.pendingTransactions,
+      this.networkDifficulty,
+      this.getLatestBlock().blockHash,
+    );
+    return miningJob;
+  }
+
   addBlock(newBlock) {
     if (this.isValidNewBlock(this.getLatestBlock(), newBlock)) {
       this.chain.push(newBlock);
+      return newBlock;
     }
+    return new Error('This is not a valid block');
   }
 
   addTransaction(transaction) {
@@ -82,10 +94,14 @@ class Blockchain {
   isValidNewBlock(previousBlock, newBlock) {
     if (previousBlock.index + 1 !== newBlock.index) {
       return false;
-    } if (previousBlock.hash !== newBlock.previousHash) {
+    } if (previousBlock.blockHash !== newBlock.prevBlockHash) {
       return false;
     }
     return true;
+  }
+
+  isValidBlockHash(blockHash, blockDataHash, dateCreated) {
+
   }
 }
 
