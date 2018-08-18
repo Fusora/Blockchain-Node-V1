@@ -6,7 +6,6 @@
   "scripts": {
     "test": "jest",
     "dev": "nodemon -r @babel/register src/index.js",
-    "mine": "python3 src/miner.py",
     "start": "node src/index.js"
   },
   "repository": {
