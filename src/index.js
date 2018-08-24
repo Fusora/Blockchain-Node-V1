@@ -23,13 +23,7 @@ const blockchain = new Blockchain();
 const node = new Node(uuid(), `http://localhost:${HTTP_PORT}`, null, blockchain);
 
 wss.on('connection', (ws) => {
-  ws.on('open', () => {
-    ws.send('hello');
-  });
-
-  ws.on('message', (data) => {
-    console.log(data);
-  });
+  node.initWebsocketListeners(ws);
 });
 
 // initializes routes for rest api

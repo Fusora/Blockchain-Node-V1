@@ -1,7 +1,6 @@
 import Block from './Block';
 import Transaction from './Transaction';
 
-const privateProperty = new WeakMap();
 const coinbaseAddress = '0000000000000000000000000000000000000000';
 
 class Blockchain {
@@ -34,7 +33,6 @@ class Blockchain {
   generateGenesisBlock() {
     const genesisBlock = new Block(0, undefined, 0, '0', coinbaseAddress, undefined, 0, '2018-08-17T08:33:54.119Z', '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7');
     if (!this.chain.includes(genesisBlock)) {
-      privateProperty.set(this, { genesisBlock });
       this.chain.push(genesisBlock);
     }
   }
@@ -145,15 +143,17 @@ class Blockchain {
   }
 
   replaceChain(newBlocks) {
-    if (Blockchain.isValidChain(newBlocks) && newBlocks.length > this.chain.length) {
+    if (this.isValidChain(newBlocks) && newBlocks.length > this.chain.length) {
       this.chain = newBlocks;
+      console.log('Chain replaced');
     } else {
       console.log('Invalid chain replacement');
     }
   }
 
   isValidChain(chain) {
-    if (chain[0] !== privateProperty.get(this).genesisBlock) {
+    if (JSON.stringify(chain[0]) !== JSON.stringify(this.chain[0])) {
+      console.log('Genesis block is invalid');
       return false;
     }
     const tempBlock = [chain[0]];

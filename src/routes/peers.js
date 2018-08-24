@@ -13,9 +13,5 @@ export default (node) => {
     res.send(peer);
   });
 
-  router.post('/notify-new-block', (req, res) => {
-
-  });
-
   return router;
 };

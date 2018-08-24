@@ -25,7 +25,13 @@ export default (node) => {
   router.post('/submit-mined-block', (req, res) => {
     const minedBlock = req.body;
 
+    // if submitted mined block is valid, send the new chain to connected peers
+
     if (!(node.blockchain.addBlock(minedBlock, networkDifficulty) instanceof Error)) {
+      node.notifyPeers({
+        type: 'NEW_CHAIN_RECEIVED',
+        data: node.blockchain.chain,
+      });
       res.status(200).send(minedBlock);
     } else {
       res.status(400).send({ error: 'The block submitted is invalid' });
