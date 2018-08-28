@@ -55,6 +55,11 @@ class Blockchain {
     return confirmedTransactions.filter(t => t.transactionDataHash === transactionHash)[0];
   }
 
+  getTransactionsByAddress(address) {
+    const confirmedTransactions = this.getConfirmedTransactions();
+    return confirmedTransactions.filter(t => t.from === address || t.to === address);
+  }
+
   getMiningJob() {
     if (!this.pendingBlock) {
       this.pendingBlock = new Block(

@@ -4,11 +4,24 @@ export default (node) => {
   const router = express.Router();
 
   router.get('/:address/transactions', (req, res) => {
-    res.status(200).send({ firstname: 'congrates!' });
+    const { address } = req.params;
+
+    if (address) {
+      const transactions = node.blockchain.getTransactionsByAddress(address);
+      res.status(200).send(transactions);
+    } else {
+      res.status(400).send({ error: 'Invalid address sent' });
+    }
   });
 
   router.get('/:address/balance', (req, res) => {
-    res.status(200).send(node);
+    const { address } = req.params;
+
+    if (address) {
+
+    } else {
+
+    }
   });
 
   return router;

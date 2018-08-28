@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:watch": "jest --watch",
     "node": "nodemon -r @babel/register src/index.js",
     "start": "node src/index.js"
   },
