@@ -1,4 +1,3 @@
-import Joi from 'joi';
 import { utils } from 'ethers';
 import transactionSchema from '../schema/TransactionSchema';
 import Model from './Model';
