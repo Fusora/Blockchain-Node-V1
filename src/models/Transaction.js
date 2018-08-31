@@ -16,6 +16,7 @@ class Transaction extends Model {
     this.data = data;
     this.senderPubKey = senderPubKey;
     this.senderSignature = senderSignature;
+    this.transactionDataHash = this.transactionHash;
   }
 
   static get schema() {

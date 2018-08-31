@@ -1,15 +1,45 @@
-import BlockSchema from '../schema/BlockSchema';
-import Model from './Model';
+import WebSocket from 'ws';
 
-class Node extends Model {
-  constructor(nodeId, selfUrl, peers, chain) {
+class Node {
+  constructor(nodeId, selfUrl, sockets, chain) {
     this.nodeId = nodeId;
     this.selfUrl = selfUrl;
-    this.peers = peers;
+    this.sockets = sockets || [];
     this.blockchain = chain;
   }
-  static get schema() {
-    return BlockSchema;
+
+  initWebsocketListeners(ws) {
+    ws.on('open', () => {
+      this.ws.send('hello');
+    });
+
+    ws.on('message', (message) => {
+      const msgParsed = JSON.parse(message);
+      if (msgParsed.type === 'NEW_CHAIN_RECEIVED') {
+        this.blockchain.replaceChain(msgParsed.data);
+      }
+    });
+  }
+
+  connectToPeer(peer) {
+    const ws = new WebSocket(peer);
+    ws.on('open', () => {
+      console.log(`Connected to peer ${peer} --> SUCCESS`);
+      this.sockets.push(ws);
+    });
+    ws.on('error', () => {
+      console.log(`Connection to peer ${peer} --> FAILED`);
+    });
+  }
+
+  getPeers() {
+    return this.sockets.map(s => `${s._socket.remoteAddress}:${s._socket.remotePort}`);
+  }
+
+  notifyPeers(message) {
+    this.sockets.forEach((socket) => {
+      socket.send(JSON.stringify(message));
+    });
   }
 }
 
