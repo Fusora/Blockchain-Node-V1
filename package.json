@@ -7,7 +7,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "node": "nodemon -r @babel/register src/index.js",
-    "start": "node -r @babel/register src/index.js"
+    "babel": "BABEL_ENV=production babel src -d dist",
+    "heroku-postbuild": "npm run babel",
+    "start": "node dist/index.js"
   },
   "repository": {
     "type": "git",
