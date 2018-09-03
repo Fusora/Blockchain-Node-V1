@@ -7,7 +7,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "node": "nodemon -r @babel/register src/index.js",
-    "start": "node src/index.js"
+    "start": "node -r @babel/register src/index.js"
   },
   "repository": {
     "type": "git",
