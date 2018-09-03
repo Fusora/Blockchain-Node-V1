@@ -30,7 +30,7 @@ wss.on('connection', (ws) => {
 setupRouter(app, node);
 handleException();
 
-app.listen(HTTP_PORT, () => {
+app.listen(HTTP_PORT || 3000, () => {
   console.log(`Running Fusora Node Number ${NODE_INDEX}`);
   console.log(`On HTTP_PORT: http://localhost:${HTTP_PORT}`);
   console.log(`Peer to peer port: ${WS_PORT}`);
