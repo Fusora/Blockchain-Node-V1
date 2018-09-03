@@ -52,8 +52,6 @@ describe('Trie', () => {
       expect(trie.root.children.get('SOME_RANDOM_STRING').value).toEqual(3);
       expect(trie.root.children.get('SOME_RANDOM_STRING_1')).toEqual(undefined);
     });
-
-    it('Updates the value of the string');
   });
 
   describe('find', () => {
@@ -68,6 +66,15 @@ describe('Trie', () => {
       expect(trie.find('0b28x46cf5569aefa1acc1009290c8e043747172d89')).toEqual({ children: new Map(), value: undefined });
       trie.add('ABA', 232);
       expect(trie.find('A')).toEqual({ children: new Map([['AA', new TrieNode(null, 2332)], ['BA', new TrieNode(null, 232)]]), value: undefined });
+    });
+  });
+
+  describe('getAllValues', () => {
+    it('Returns all the values in the Trie', () => {
+      trie.add('AAA', 2332);
+      trie.add('BBB', 200);
+      trie.add('CCC', 300);
+      expect(trie.getAllValues()).toEqual({ AAA: 2332, BBB: 200, CCC: 300 });
     });
   });
 });

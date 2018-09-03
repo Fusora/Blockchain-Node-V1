@@ -49,6 +49,10 @@ class Blockchain {
     return this.getLatestBlock().stateTrie.getValue(address);
   }
 
+  getBalances() {
+    return this.getLatestBlock().stateTrie.getAllValues();
+  }
+
   getLatestBlock() {
     return this.chain[this.chain.length - 1];
   }
@@ -103,7 +107,10 @@ class Blockchain {
       minerAddress, transactions, index, prevBlockHash, difficulty,
     } = blockedMineData;
 
+    // Delete the miningJob created by miner
     // Prepare new block to be added in the main chain
+
+    delete this.miningJobs[minerAddress];
     const block = new Block({
       index,
       transactions,
@@ -144,7 +151,7 @@ class Blockchain {
       } = txn;
       const senderValue = updatedStateTrie.getValue(from);
       const recipientValue = updatedStateTrie.getValue(to);
-      updatedStateTrie.add(from, senderValue - value - fee);
+      if (from !== coinbaseAddress) updatedStateTrie.add(from, senderValue - value - fee);
       updatedStateTrie.add(to, recipientValue + value);
     });
     block.stateTrie = updatedStateTrie;
@@ -169,14 +176,18 @@ class Blockchain {
 
     this.chain.push(block);
     this.removeFromPendingTransactions(transactions);
-    this.pendingTransactions.unshift(minerReward);
+    this.addToPendingTransactions(minerReward, true);
     return this.getLatestBlock();
   }
 
-  addToPendingTransactions(transaction) {
+  addToPendingTransactions(transaction, isCoinbase = false) {
     const newTransaction = new Transaction(transaction);
-    const index = this.pendingTransactions.push(newTransaction);
-    return this.pendingTransactions[index - 1];
+    if (isCoinbase) {
+      this.pendingTransactions.unshift(newTransaction);
+    } else {
+      this.pendingTransactions.push(newTransaction);
+    }
+    return newTransaction;
   }
 
   removeFromPendingTransactions(transactions) {
