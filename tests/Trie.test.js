@@ -52,6 +52,8 @@ describe('Trie', () => {
       expect(trie.root.children.get('SOME_RANDOM_STRING').value).toEqual(3);
       expect(trie.root.children.get('SOME_RANDOM_STRING_1')).toEqual(undefined);
     });
+
+    it('Updates the value of the string');
   });
 
   describe('find', () => {

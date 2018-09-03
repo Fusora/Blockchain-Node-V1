@@ -3,10 +3,11 @@ import { utils } from 'ethers';
 import TransactionSchema from '../schema/TransactionSchema';
 
 class Transaction {
-  constructor(
-    from, to, value, fee, dateCreated, data,
-    senderPubKey, senderSignature,
-  ) {
+  constructor(props) {
+    const {
+      from, to, value, fee, dateCreated, data,
+      senderPubKey, senderSignature,
+    } = props;
     this.from = from;
     this.to = to;
     this.value = value;

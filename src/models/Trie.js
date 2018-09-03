@@ -39,6 +39,14 @@ class Trie {
 
     return matchedNode;
   }
+
+  getValue(input, node = this.root) {
+    const matchedNode = this.find(input, node);
+    if (matchedNode && matchedNode.value) {
+      return matchedNode.value;
+    }
+    return 0;
+  }
 }
 
 export default Trie;

@@ -30,7 +30,7 @@ export default (node) => {
 
   router.post('/send', (req, res) => {
     const transactionData = req.body;
-    const transaction = node.blockchain.addTransaction(transactionData);
+    const transaction = node.blockchain.addToPendingTransactions(transactionData);
 
     if (transaction) {
       res.status(200).send(transaction);

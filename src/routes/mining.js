@@ -10,7 +10,7 @@ export default (node) => {
 
     if (miningJob) {
       const miningJobData = {
-        transactionsIncluded: miningJob.transactions.length,
+        transactions: miningJob.transactions,
         expectedReward: 5000000,
         rewardAddress: address,
         ...miningJob,
@@ -26,8 +26,9 @@ export default (node) => {
     const minedBlock = req.body;
 
     // if submitted mined block is valid, send the new chain to connected peers
+    const block = node.blockchain.addBlock(minedBlock);
 
-    if (!(node.blockchain.addBlock(minedBlock, networkDifficulty) instanceof Error)) {
+    if (!(block instanceof Error)) {
       node.notifyPeers({
         type: 'NEW_CHAIN_RECEIVED',
         data: node.blockchain.chain,

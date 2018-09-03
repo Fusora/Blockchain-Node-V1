@@ -1,20 +1,28 @@
 import CryptoJS from 'crypto-js';
+import Trie from './Trie';
 
 class Block {
-  constructor(
-    index, transactions, difficulty, prevBlockHash,
-    minedBy, blockDataHash, nonce, dateCreated, blockHash,
-  ) {
+  constructor(props) {
+    const {
+      index, transactions, difficulty, prevBlockHash,
+      minedBy, nonce, dateCreated, blockHash, trie,
+    } = props;
     this.index = index;
-    this.transactions = transactions;
+    this.transactions = transactions || [];
     this.difficulty = difficulty;
     this.prevBlockHash = prevBlockHash;
-    this.blockDataHash = blockDataHash || this.calculateBlockDataHash();
+    this.blockDataHash = Block.calculateBlockDataHash(
+      this.index, this.difficulty,
+      this.transactions, this.prevBlockHash,
+    );
+
     // properties to be modified after a block is mined
+
     this.minedBy = minedBy;
     this.nonce = nonce;
     this.dateCreated = dateCreated;
     this.blockHash = blockHash;
+    this.stateTrie = trie || new Trie();
   }
 
   static calculateHash(blockDataHash, dateCreated, nonce) {
@@ -22,29 +30,17 @@ class Block {
     return CryptoJS.SHA256(data).toString();
   }
 
-  calculateBlockDataHash() {
-    const {
-      index, difficulty, transactions, prevBlockHash,
-    } = this;
+  static calculateBlockDataHash(index, difficulty, transactions, prevBlockHash) {
     const dataString = JSON.stringify(transactions);
     return CryptoJS.SHA256(index + dataString + difficulty + prevBlockHash).toString();
   }
 
   getTotalFees() {
-    if (this.transactions) {
-      return this.transactions.reduce((total, val) => {
-        let totalFees = total;
-        totalFees += Number(val.fee);
-        return totalFees;
-      }, 0);
-    }
-    return 0;
-  }
-
-  addTransaction(transaction) {
-    if (!this.transactions) this.transactions = [];
-    this.transactions.push(transaction);
-    return this.transactions;
+    return this.transactions.reduce((total, val) => {
+      let totalFees = total;
+      totalFees += Number(val.fee);
+      return totalFees;
+    }, 0);
   }
 }
 

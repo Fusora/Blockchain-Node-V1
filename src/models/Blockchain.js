@@ -4,11 +4,11 @@ import Transaction from './Transaction';
 const coinbaseAddress = '0000000000000000000000000000000000000000';
 
 class Blockchain {
-  constructor(currentDifficulty = 4, transactions) {
+  constructor(currentDifficulty = 4) {
     this.chain = [];
     this.difficulty = currentDifficulty;
-    this.pendingTransactions = transactions || [];
-    this.pendingBlock = undefined;
+    this.pendingTransactions = [];
+    this.miningJobs = {};
     this.generateGenesisBlock();
   }
 
@@ -31,10 +31,22 @@ class Blockchain {
   }
 
   generateGenesisBlock() {
-    const genesisBlock = new Block(0, undefined, 0, '0', coinbaseAddress, undefined, 0, '2018-08-17T08:33:54.119Z', '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7');
+    const genesisBlock = new Block({
+      index: 0,
+      difficulty: 0,
+      prevBlockHash: '0',
+      minedBy: coinbaseAddress,
+      nonce: 0,
+      dateCreated: '2018-08-17T08:33:54.119Z',
+      blockHash: '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7',
+    });
     if (!this.chain.includes(genesisBlock)) {
       this.chain.push(genesisBlock);
     }
+  }
+
+  getBalance(address) {
+    return this.getLatestBlock().stateTrie.getValue(address);
   }
 
   getLatestBlock() {
@@ -60,83 +72,114 @@ class Blockchain {
     return confirmedTransactions.filter(t => t.from === address || t.to === address);
   }
 
-  getMiningJob() {
-    if (!this.pendingBlock) {
-      this.pendingBlock = new Block(
-        this.getLatestBlock().index + 1,
-        this.pendingTransactions,
-        this.networkDifficulty,
-        this.getLatestBlock().blockHash,
-      );
-    }
+  getMiningJob(minerAddress) {
+    // Remove invalid transactions from the pendingTransactions using the latestStateTrie
+    // Add block as miningJob mapped with minerAddress as key
+    // Allow transaction if it came from coinbase address
 
-    return this.pendingBlock;
+    const latestStateTrie = this.getLatestBlock().stateTrie;
+    const invalidTransactions = this.pendingTransactions.filter((txn) => {
+      const { from, value, fee } = txn;
+      const senderValue = latestStateTrie.getValue(from);
+      return senderValue < value + fee && from !== coinbaseAddress;
+    });
+
+    this.removeFromPendingTransactions(invalidTransactions);
+
+    const block = new Block({
+      index: this.getLatestBlock().index + 1,
+      transactions: this.pendingTransactions,
+      difficulty: this.difficulty,
+      prevBlockHash: this.getLatestBlock().blockHash,
+    });
+
+    this.miningJobs[minerAddress] = block;
+    return block;
   }
 
-  addBlock(blockedMineData, networkDifficulty) {
+  addBlock(blockedMineData) {
     const {
-      blockHash, blockDataHash, nonce, dateCreated, minerAddress,
+      blockHash, blockDataHash, nonce, dateCreated,
+      minerAddress, transactions, index, prevBlockHash, difficulty,
     } = blockedMineData;
 
-    if (!this.pendingBlock) {
-      return new Error('No block prepared for mining');
+    // Prepare new block to be added in the main chain
+    const block = new Block({
+      index,
+      transactions,
+      difficulty,
+      prevBlockHash,
+      minedBy: minerAddress,
+      blockDataHash,
+      nonce,
+      dateCreated,
+      blockHash,
+    });
+
+    if (
+      Block.calculateBlockDataHash(index, difficulty, transactions, prevBlockHash)
+      !== blockDataHash
+    ) {
+      return new Error('The submitted mined data is invalid');
     }
 
     if (!Blockchain.isValidBlockHash(blockHash, blockDataHash, dateCreated, nonce)) {
       return new Error('The submitted block has an invalid hash');
     }
 
-    if (!Blockchain.isValidNewBlock(this.getLatestBlock(), this.pendingBlock)) {
+    if (!Blockchain.isValidNewBlock(this.getLatestBlock(), block)) {
       return new Error('This is not a valid block');
     }
 
-    if (!Blockchain.isValidHash(blockHash, networkDifficulty)) {
+    if (!Blockchain.isValidHash(blockHash, difficulty)) {
       return new Error('The submitted hash is invalid with the network difficulty');
     }
 
-    // set miner data in pendingBlock after submitted mineData has been validated
-    this.pendingBlock.nonce = nonce;
-    this.pendingBlock.dateCreated = dateCreated;
-    this.pendingBlock.blockHash = blockHash;
-    this.pendingBlock.minedBy = minerAddress;
+    // If new block is valid, calculate the new balances of the stateTrie and update it
 
-    const minerReward = {
+    const updatedStateTrie = this.getLatestBlock().stateTrie;
+    transactions.forEach((txn) => {
+      const {
+        from, to, value, fee,
+      } = txn;
+      const senderValue = updatedStateTrie.getValue(from);
+      const recipientValue = updatedStateTrie.getValue(to);
+      updatedStateTrie.add(from, senderValue - value - fee);
+      updatedStateTrie.add(to, recipientValue + value);
+    });
+    block.stateTrie = updatedStateTrie;
+
+    // Prepare the coinbase transaction and put it in the first index of pendingTransactions
+    // Add total fees in the block as reward to the miner
+
+    const minerReward = new Transaction({
       from: coinbaseAddress,
       to: minerAddress,
-      value: 5000000,
-      fee: this.pendingBlock.getTotalFees(),
+      value: 5000000 + block.getTotalFees(),
+      fee: 0,
       dateCreated: new Date().toISOString(),
       data: 'miner reward',
       senderPubKey: '00000000000000000000000000000000000000000000000000000000000000000',
       senderSignature: ['00000000000000000000000000000000000000000000000000000000000000000', '00000000000000000000000000000000000000000000000000000000000000000'],
-    };
+    });
 
     // add the block to the chain
     // remove pending transactions that were inside the newly mined block
     // add the coinbase reward as the first transaction for the next block
 
-    this.chain.push(this.pendingBlock);
-    this.removeTransactions(this.pendingBlock.transactions);
+    this.chain.push(block);
+    this.removeFromPendingTransactions(transactions);
     this.pendingTransactions.unshift(minerReward);
-    this.pendingBlock = undefined;
-
     return this.getLatestBlock();
   }
 
-  addTransaction(transaction) {
-    const {
-      from, to, value, fee, dateCreated, data,
-      senderPubKey, senderSignature,
-    } = transaction;
-    const newTransaction = new Transaction(
-      from, to, value, fee, dateCreated,
-      data, senderPubKey, senderSignature,
-    );
+  addToPendingTransactions(transaction) {
+    const newTransaction = new Transaction(transaction);
     const index = this.pendingTransactions.push(newTransaction);
     return this.pendingTransactions[index - 1];
   }
 
-  removeTransactions(transactions) {
+  removeFromPendingTransactions(transactions) {
     const transactionHashes = transactions.map(t => t.transactionDataHash);
     this.pendingTransactions = this.pendingTransactions.filter((t) => {
       if (!transactionHashes.includes(t.transactionDataHash)) {

@@ -18,9 +18,10 @@ export default (node) => {
     const { address } = req.params;
 
     if (address) {
-
+      const balance = node.blockchain.getBalance(address);
+      res.status(200).send({ address, balance });
     } else {
-
+      res.status(400).send({ error: 'Invalid address sent' });
     }
   });
 
