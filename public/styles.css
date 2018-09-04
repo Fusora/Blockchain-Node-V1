@@ -1,0 +1,78 @@
+body {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    background: linear-gradient(#005DE0, #00C4FB);
+    height: 100vh;
+    width: 100vw;
+    padding: 0;
+    color: #333;
+}
+
+h1,h2,h3,h4,h5 {
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+#fusora-logo {
+    width: 100px;
+    height: auto;
+}
+
+#chain-logo {
+    z-index: 9999;
+    width: 100px;
+    height: auto;
+}
+
+#card {
+    box-shadow: 0 10px 30px rgba(51,51,51,.1);
+    background: #ffffff;  
+    transition-duration: 200ms;
+}
+
+#card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    width: 600px;
+    height: 200px;
+    margin-top: 70px;
+    margin-bottom: -15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-header h1 {
+    margin: 0;
+    margin-bottom: 7px;
+    font-size: 1.95em;
+}
+
+.card-header p {
+    margin: 0;
+    font-size: 1.1em;
+    color: #555;
+}
+
+.card-body {
+    margin-top: -15px;
+    width: 600px;
+    height: 425px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.card-body p {
+    margin: 0;
+}

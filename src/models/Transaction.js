@@ -3,10 +3,12 @@ import transactionSchema from '../schema/TransactionSchema';
 import Model from './Model';
 
 class Transaction extends Model {
-  constructor(
-    from, to, value, fee, dateCreated, data,
-    senderPubKey, senderSignature,
-  ) {
+  constructor(props) {
+    super(props);
+    const {
+      from, to, value, fee, dateCreated, data,
+      senderPubKey, senderSignature,
+    } = props;
     this.from = from;
     this.to = to;
     this.value = value;

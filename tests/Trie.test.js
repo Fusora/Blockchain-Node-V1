@@ -68,4 +68,13 @@ describe('Trie', () => {
       expect(trie.find('A')).toEqual({ children: new Map([['AA', new TrieNode(null, 2332)], ['BA', new TrieNode(null, 232)]]), value: undefined });
     });
   });
+
+  describe('getAllValues', () => {
+    it('Returns all the values in the Trie', () => {
+      trie.add('AAA', 2332);
+      trie.add('BBB', 200);
+      trie.add('CCC', 300);
+      expect(trie.getAllValues()).toEqual({ AAA: 2332, BBB: 200, CCC: 300 });
+    });
+  });
 });

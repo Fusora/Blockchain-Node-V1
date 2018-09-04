@@ -1,10 +1,10 @@
 import Blockchain from '../src/models/Blockchain';
 import Block from '../src/models/Block';
 
-describe('Blockchain', () => {
+describe.only('Blockchain', () => {
   let blockchain;
-  const genesisHash = '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7';
   const coinbaseAddress = '0000000000000000000000000000000000000000';
+  const genesisHash = '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7';
 
   beforeEach(() => {
     blockchain = new Blockchain();
@@ -12,17 +12,27 @@ describe('Blockchain', () => {
 
   describe('addBlock', () => {
     it('Adds a new block in the chain', () => {
-      const blockDataHash = '33a4ac76e7b5f579854c842144da482073e650cd6b45e693c5c353a4c3da6f8e';
-      const dateCreated = '2018-08-19T14:37:16.114Z';
-      const nonce = 123;
+      const transactions = [];
+      const index = 1;
+      const difficulty = 4;
+      const prevBlockHash = genesisHash;
+      const dateCreated = '2018-09-03T12:56:10.736Z';
+      const nonce = 8442;
+      const blockDataHash = 'fb0a9b872db3deec4cedb5c965935c1f3bb564740f60259397ad695aa38e6ff3';
+      const blockHash = '00002d4b49dba1d64457d06e2d0796213b19b39e7fc9743d7cad8be46c786c25';
+
       const mineData = {
-        blockHash: Block.calculateHash(blockDataHash, dateCreated, nonce),
+        blockHash,
+        prevBlockHash,
         dateCreated,
         nonce,
         blockDataHash,
+        transactions,
+        difficulty,
+        index,
       };
-      blockchain.getMiningJob();
-      blockchain.addBlock(mineData, 0);
+
+      expect(blockchain.addBlock(mineData).blockHash).toEqual(blockHash);
       expect(blockchain.chain.length).toEqual(2);
     });
 
@@ -77,65 +87,23 @@ describe('Blockchain', () => {
 
   describe('getConfirmedTransactions', () => {
     it('Gets all the transactions that are in the blocks', () => {
-      const blockDataHash1 = '33a4ac76e7b5f579854c842144da482073e650cd6b45e693c5c353a4c3da6f8e';
-      const dateCreated1 = '2018-08-19T14:37:16.114Z';
-      const nonce1 = 123;
-      const mineData1 = {
-        blockHash: Block.calculateHash(blockDataHash1, dateCreated1, nonce1),
-        dateCreated: dateCreated1,
-        nonce: nonce1,
-        blockDataHash: blockDataHash1,
-      };
-
-
-      blockchain.addTransaction({});
-      blockchain.addTransaction({});
-      blockchain.addTransaction({});
-      blockchain.getMiningJob();
-      blockchain.addBlock(mineData1, 0);
-
-      const blockDataHash2 = '33a4ac76e7b5f579854c842144da482073e650cd6b45e693c5c353a4c3da6f8e';
-      const dateCreated2 = '2018-08-19T14:37:16.114Z';
-      const nonce2 = 123;
-      const mineData2 = {
-        blockHash: Block.calculateHash(blockDataHash2, dateCreated2, nonce2),
-        dateCreated: dateCreated2,
-        nonce: nonce2,
-        blockDataHash: blockDataHash2,
-      };
-
-      blockchain.addTransaction({});
-      blockchain.getMiningJob();
-      blockchain.addBlock(mineData2, 0);
-
-      expect(blockchain.chain.length).toEqual(3);
-      expect(blockchain.getConfirmedTransactions().length).toEqual(4 + 1);
-      expect(blockchain.pendingTransactions[0].from).toEqual(coinbaseAddress);
+      const confirmedTransactions = [{}, {}, {}, {}];
+      blockchain.chain = [{ transactions: confirmedTransactions }];
+      expect(blockchain.getConfirmedTransactions()).toEqual(confirmedTransactions);
     });
   });
 
   describe('getTransaction', () => {
     it('Returns the transaction based on the transaction hash', () => {
-      const blockDataHash = '33a4ac76e7b5f579854c842144da482073e650cd6b45e693c5c353a4c3da6f8e';
-      const dateCreated = '2018-08-19T14:37:16.114Z';
-      const nonce = 123;
-      const mineData = {
-        blockHash: Block.calculateHash(blockDataHash, dateCreated, nonce),
-        dateCreated,
-        nonce,
-        blockDataHash,
-      };
-
-      blockchain.addTransaction({ from: 'some guy' });
-      blockchain.addTransaction({ from: 'some potato' });
-      blockchain.addTransaction({ from: 'secret' });
-      blockchain.getMiningJob();
-      blockchain.addBlock(mineData, 0);
-
-      expect(blockchain.pendingTransactions.length).toEqual(1);
-      expect(blockchain.chain.length).toEqual(2);
-      expect(blockchain.getConfirmedTransactions().length).toEqual(3);
-      expect(blockchain.getTransaction('0xa50d5d37c9b94c63e4b26bcfd0130d0501276dc0a5c37409e051dcdb7b6289d3').from).toEqual('some guy');
+      blockchain.chain = [
+        {
+          transactions: [{ transactionDataHash: 'AAAA' }],
+        },
+        {
+          transactions: [{ transactionDataHash: 'BBBBAC' }],
+        },
+      ];
+      expect(blockchain.getTransaction('AAAA')).toEqual(blockchain.chain[0].transactions[0]);
     });
   });
 });

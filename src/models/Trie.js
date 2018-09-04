@@ -39,6 +39,31 @@ class Trie {
 
     return matchedNode;
   }
+
+  getValue(input, node = this.root) {
+    const matchedNode = this.find(input, node);
+    if (matchedNode && matchedNode.value) {
+      return matchedNode.value;
+    }
+    return 0;
+  }
+
+  getAllValues(node = this.root, str = '', values = {}) {
+    if (!node) {
+      return;
+    }
+
+    if (node.value) {
+      values[str] = node.value;
+    }
+
+    node.children.forEach((child, key) => {
+      this.getAllValues(child, str + key, values);
+    });
+
+    /* eslint-disable */
+    return values; 
+  }
 }
 
 export default Trie;
