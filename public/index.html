@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Fusora Main Node</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="styles.css">
+        <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    </head>
+    <body>
+        <div id="container">
+            <div id="card" class="card-header">
+                    <img src="assets/fusora.png" alt="Fusora Logo" id="fusora-logo"/>
+                    <h1> Fusora </h1>
+                    <p> The Next Generation Blockchain </p>
+            </div>
+            <img src="assets/chain.png" alt="Chain" id="chain-logo"/>
+            <div id="card" class="card-body">
+                <p>GET /</p>  
+                <p>GET /info</p> 
+                <p>GET /debug</p>
+                <p>GET /debug/reset-chain</p>
+                <p>GET /debug/mine/:minerAddress/:difficulty </p>
+                <p>GET /blocks</p>
+                <p>GET /blocks/:index</p>   
+                <p>GET /transactions/pending</p>   
+                <p>GET /transactions/confirmed</p>  
+                <p>GET /transactions/:tranHash</p>   
+                <p>GET /balances</p>  
+                <p>GET /address/:address/transactions </p>
+                <p>GET /address/:address/balance</p> 
+                <p>POST /transactions/send </p>
+                <p>GET /peers </p>
+                <p>POST /peers/connect</p> 
+                <p>POST /peers/notify-new-block </p>
+                <p>GET /mining/get-mining-job/:address </p>
+                <p>POST /mining/submit-mined-block</p>
+            </div>
+        </div>
+    </body>
+</html>

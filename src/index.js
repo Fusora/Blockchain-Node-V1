@@ -8,6 +8,7 @@ import Blockchain from './models/Blockchain';
 import handleException from './handleException';
 
 const app = express()
+  .use(express.static('public'))
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({ extended: true }));
 
