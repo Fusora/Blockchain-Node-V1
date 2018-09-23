@@ -150,15 +150,20 @@ class Blockchain {
     }
 
     // If new block is valid, calculate the new balances of the stateTrie and update it
+    // In updating balances, first update the senderValue, then update the recipientValue
+    // If not, incorrect balance will occur when sending to your own address
 
     const updatedStateTrie = this.getLatestBlock().stateTrie;
+
     transactions.forEach((txn) => {
       const {
         from, to, value, fee,
       } = txn;
-      const senderValue = updatedStateTrie.getValue(from);
+      if (from !== coinbaseAddress) {
+        const senderValue = updatedStateTrie.getValue(from);
+        updatedStateTrie.add(from, senderValue - value - fee);
+      }
       const recipientValue = updatedStateTrie.getValue(to);
-      if (from !== coinbaseAddress) updatedStateTrie.add(from, senderValue - value - fee);
       updatedStateTrie.add(to, recipientValue + value);
     });
     block.stateTrie = updatedStateTrie;
@@ -183,12 +188,13 @@ class Blockchain {
 
     this.chain.push(block);
     this.removeFromPendingTransactions(transactions);
-    this.addToPendingTransactions(minerReward, true);
+    this.addToPendingTransactions(minerReward, { isCoinbase: true });
     return this.getLatestBlock();
   }
 
-  addToPendingTransactions(transaction, isCoinbase = false) {
+  addToPendingTransactions(transaction, options = { isCoinbase: false }) {
     const newTransaction = new Transaction(transaction);
+    const { isCoinbase } = options;
     if (isCoinbase) {
       this.pendingTransactions.unshift(newTransaction);
     } else {
