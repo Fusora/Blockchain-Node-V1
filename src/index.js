@@ -14,22 +14,35 @@ const app = express()
   .use(bodyParser.urlencoded({ extended: true }))
   .use(cors());
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
+let hostname;
 
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    res.setHeader('Strict-Transport-Security', 'max-age=8640000; includeSubDomains');
+    if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] === 'http') {
+      hostname = `https://${req.host}${req.url}`;
+    }
+    return next();
+  });
+}
+
+const HOST_NAME = hostname || 'http://localhost';
 const NODE_INDEX = Number(process.argv.slice(2)) || 0;
 const PORT = process.env.PORT || 3000 + NODE_INDEX;
 const WS_PORT = process.env.WS_PORT || 6000 + NODE_INDEX;
 
 const wss = new WebSocket.Server({ port: WS_PORT });
 
+
 // Instantiate the blockchain and node
 // Pass the node instance to the routes
 const blockchain = new Blockchain();
-const node = new Node(uuid(), `http://localhost:${PORT}`, null, blockchain);
+const node = new Node({
+  nodeId: uuid(),
+  selfUrl: `${HOST_NAME}:${PORT}`,
+  socketUrl: `${HOST_NAME}:${WS_PORT}`,
+  blockchain,
+});
 
 wss.on('connection', (ws) => {
   node.initWebsocketListeners(ws);
@@ -41,6 +54,6 @@ handleException();
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Running Fusora Node Number ${NODE_INDEX}`);
-  console.log(`On HTTP_PORT: http://localhost:${PORT}`);
+  console.log(`On HTTP_PORT: ${HOST_NAME}:${PORT}`);
   console.log(`Peer to peer port: ${WS_PORT}`);
 });

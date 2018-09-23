@@ -9,7 +9,7 @@
     "node": "nodemon -r @babel/register src/index.js",
     "babel": "BABEL_ENV=production babel src -d dist",
     "heroku-postbuild": "npm run babel",
-    "start": "node dist/index.js"
+    "start": "NODE_ENV=production node dist/index.js"
   },
   "repository": {
     "type": "git",
