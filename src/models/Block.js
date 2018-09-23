@@ -35,6 +35,17 @@ class Block {
     return CryptoJS.SHA256(index + dataString + difficulty + prevBlockHash).toString();
   }
 
+  /* Returns only the relevant properties needed by the miners to mine a new block */
+  getMiningJobData() {
+    return {
+      index: this.index,
+      transactions: this.transactions,
+      difficulty: this.difficulty,
+      prevBlockHash: this.prevBlockHash,
+      blockDataHash: this.blockDataHash,
+    };
+  }
+
   getTotalFees() {
     return this.transactions.reduce((total, val) => {
       let totalFees = total;

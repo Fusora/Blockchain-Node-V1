@@ -1,17 +1,15 @@
-import Joi from 'joi';
+import Joi from './Joi';
+import addressSchema from './AddressSchema';
 
 const transactionSchema = Joi.object().keys({
-  from: Joi.string().length(40).hex().required(),
-  to: Joi.string().length(40).hex().required(),
+  from: addressSchema,
+  to: addressSchema,
   value: Joi.number().min(0).required(),
   fee: Joi.number().min(0.005).required(),
   dateCreated: Joi.date().iso().required(),
-  data: Joi.string(),
-  senderPubKey: Joi.string().length(65).hex().required(),
-  transactionDataHash: Joi.string().length(64).hex().required(),
-  senderSignature: Joi.any(), // to be updated
-  minedInBlockIndex: Joi.number().min(0).optional(),
-  transferSuccessful: Joi.boolean().required(),
+  data: Joi.string().optional().allow(null).allow(''),
+  senderPubKey: Joi.string().pubKey().required(),
+  senderSignature: Joi.any(),
 });
 
 export default transactionSchema;

@@ -76,7 +76,7 @@ class Blockchain {
     return confirmedTransactions.filter(t => t.from === address || t.to === address);
   }
 
-  getMiningJob(minerAddress) {
+  takeMiningJob(minerAddress) {
     // Remove invalid transactions from the pendingTransactions using the latestStateTrie
     // Add block as miningJob mapped with minerAddress as key
     // Allow transaction if it came from coinbase address
@@ -97,26 +97,33 @@ class Blockchain {
       prevBlockHash: this.getLatestBlock().blockHash,
     });
 
-    this.miningJobs[minerAddress] = block;
-    return block;
+    const miningJob = {
+      expectedReward: 5000000,
+      rewardAddress: minerAddress,
+      difficulty: this.difficulty,
+      ...block.getMiningJobData(),
+    };
+
+    this.miningJobs[minerAddress] = miningJob;
+    return miningJob;
   }
 
   addBlock(blockedMineData) {
     const {
       blockHash, blockDataHash, nonce, dateCreated,
-      minerAddress, transactions, index, prevBlockHash, difficulty,
+      minedBy, transactions, index, prevBlockHash, difficulty,
     } = blockedMineData;
 
     // Delete the miningJob created by miner
     // Prepare new block to be added in the main chain
 
-    delete this.miningJobs[minerAddress];
+    delete this.miningJobs[minedBy];
     const block = new Block({
       index,
       transactions,
       difficulty,
       prevBlockHash,
-      minedBy: minerAddress,
+      minedBy,
       blockDataHash,
       nonce,
       dateCreated,
@@ -161,7 +168,7 @@ class Blockchain {
 
     const minerReward = new Transaction({
       from: coinbaseAddress,
-      to: minerAddress,
+      to: minedBy,
       value: 5000000 + block.getTotalFees(),
       fee: 0,
       dateCreated: new Date().toISOString(),

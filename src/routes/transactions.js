@@ -1,4 +1,5 @@
 import express from 'express';
+import transactionSchema from '../schema/TransactionSchema';
 
 export default (node) => {
   const router = express.Router();
@@ -30,6 +31,13 @@ export default (node) => {
 
   router.post('/send', (req, res) => {
     const transactionData = req.body;
+    const transactionError = transactionSchema.validate(transactionData).error;
+
+    if (transactionError) {
+      res.status(400).send({ error: transactionError });
+      return res.end();
+    }
+
     const transaction = node.blockchain.addToPendingTransactions(transactionData);
 
     if (transaction) {

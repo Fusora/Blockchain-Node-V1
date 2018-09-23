@@ -1,31 +1,36 @@
 import express from 'express';
+import addressSchema from '../schema/AddressSchema';
+import blockSchema from '../schema/BlockSchema';
 
 export default (node) => {
   const router = express.Router();
-  const networkDifficulty = node.blockchain.difficulty;
 
   router.get('/get-mining-job/:address', (req, res) => {
     const { address } = req.params;
-    const miningJob = node.blockchain.getMiningJob();
+
+    if (addressSchema.validate(address).error) {
+      res.status(400).send({ error: 'Invalid or no address sent' });
+      return res.end();
+    }
+
+    const miningJob = node.blockchain.takeMiningJob(address);
 
     if (miningJob) {
-      const miningJobData = {
-        transactions: miningJob.transactions,
-        expectedReward: 5000000,
-        rewardAddress: address,
-        ...miningJob,
-        difficulty: networkDifficulty,
-      };
-      res.status(200).send(miningJobData);
+      res.status(200).send(miningJob);
     } else {
-      res.status(400).send({ error: 'Error in finding a mining job' });
+      res.status(400).send({ error: 'No mining job found' });
     }
   });
 
   router.post('/submit-mined-block', (req, res) => {
     const minedBlock = req.body;
+    const validationError = blockSchema.validate(minedBlock).error;
 
-    // if submitted mined block is valid, send the new chain to connected peers
+    if (validationError) {
+      res.status(400).send({ error: validationError });
+      return res.end();
+    }
+
     const block = node.blockchain.addBlock(minedBlock);
 
     if (!(block instanceof Error)) {
