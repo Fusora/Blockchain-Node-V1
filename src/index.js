@@ -14,19 +14,7 @@ const app = express()
   .use(bodyParser.urlencoded({ extended: true }))
   .use(cors());
 
-let hostname;
-
-if (process.env.NODE_ENV === 'production') {
-  app.use((req, res, next) => {
-    res.setHeader('Strict-Transport-Security', 'max-age=8640000; includeSubDomains');
-    if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] === 'http') {
-      hostname = `https://${req.host}${req.url}`;
-    }
-    return next();
-  });
-}
-
-const HOST_NAME = hostname || 'http://localhost';
+const HOST_NAME = process.env.HOST_URL || 'http://localhost';
 const NODE_INDEX = Number(process.argv.slice(2)) || 0;
 const PORT = process.env.PORT || 3000 + NODE_INDEX;
 const WS_PORT = process.env.WS_PORT || 6000 + NODE_INDEX;
