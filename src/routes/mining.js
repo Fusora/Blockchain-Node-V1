@@ -34,10 +34,7 @@ export default (node) => {
     const block = node.blockchain.addBlock(minedBlock);
 
     if (!(block instanceof Error)) {
-      node.notifyPeers({
-        type: 'NEW_CHAIN_RECEIVED',
-        data: node.blockchain.chain,
-      });
+      node.broadcastChain();
       res.status(200).send(minedBlock);
     } else {
       res.status(400).send({ error: 'The block submitted is invalid' });

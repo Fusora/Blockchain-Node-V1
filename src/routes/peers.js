@@ -9,8 +9,14 @@ export default (node) => {
 
   router.post('/connect', (req, res) => {
     const { peer } = req.body;
-    node.connectToPeer(peer);
-    res.send(peer);
+    try {
+      node.connectToPeer(peer);
+      res.status(200).send({ message: 'Successfully connected to peer', peer });
+    } catch (e) {
+      if (e.toString().includes('Peer is already connected')) {
+        res.status(400).send({ error: 'Peer is already connected' });
+      }
+    }
   });
 
   return router;
