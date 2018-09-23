@@ -1,5 +1,6 @@
 import Block from './Block';
 import Transaction from './Transaction';
+import Trie from './Trie';
 
 const coinbaseAddress = '0000000000000000000000000000000000000000';
 
@@ -45,12 +46,16 @@ class Blockchain {
     }
   }
 
-  getBalance(address) {
-    return this.getLatestBlock().stateTrie.getValue(address);
+  getBalance(address, options = { confirmations: 0 }) {
+    const { confirmations } = options;
+    const block = this.chain[this.chain.length - Number(confirmations) - 1];
+    return (block && block.stateTrie.getValue(address)) || 0;
   }
 
-  getBalances() {
-    return this.getLatestBlock().stateTrie.getAllValues();
+  getBalances(options = { confirmations: 0 }) {
+    const { confirmations } = options;
+    const block = this.chain[this.chain.length - Number(confirmations) - 1];
+    return (block && block.stateTrie.getAllValues()) || {};
   }
 
   getLatestBlock() {
@@ -153,9 +158,10 @@ class Blockchain {
     // In updating balances, first update the senderValue, then update the recipientValue
     // If not, incorrect balance will occur when sending to your own address
 
-    const updatedStateTrie = this.getLatestBlock().stateTrie;
+    const updatedStateTrie = new Trie();
+    const updatedTransactions = [...this.getConfirmedTransactions(), ...transactions];
 
-    transactions.forEach((txn) => {
+    updatedTransactions.forEach((txn) => {
       const {
         from, to, value, fee,
       } = txn;
