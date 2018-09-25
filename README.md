@@ -6,7 +6,7 @@ Fusora chain is a simple blockchain implementation created with NodeJS
 Live node: http://fusora.herokuapp.com
 ### Get started
 * npm run install
-* npm run node [integer value] //*simulate blockchain p2p network by creating nodes and connecting them to each other*
+* npm run node [integer value] //Defaults to zero if no input is given
 ### Blockchain Protocol
 * Private public keypair generation uses ECC and is the same with the Ethereum implementation
 * Allows peer synchronization of nodes through websockets using the ghost protocol
