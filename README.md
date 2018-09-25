@@ -16,3 +16,5 @@ Live node: http://fusora.herokuapp.com
 * Transactions with higher fees are given priority 
 * Network difficulty is dynamic which is calculated by the current block time vs the average block time. Average time for a new block to be created is 12 seconds.
 * Account balances are stored in a trie and each block has its own Trie data. The latest balance is taken from the latest block.
+### Api Documentation
+[Click here](./docs/API.md)
