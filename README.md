@@ -2,6 +2,7 @@
 ![Logo](https://res.cloudinary.com/depjh17m6/image/upload/c_scale,w_157/v1537890170/39026789_263502377804637_6055300130922299392_n_z6oq78.png)
 ## About
 Fusora chain is a simple blockchain implementation created with NodeJS
+
 Live node: http://fusora.herokuapp.com
 ### Get started
 * npm run install
